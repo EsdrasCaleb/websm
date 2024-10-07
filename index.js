@@ -1,1 +1,0 @@
-//Permitir o bert pegar os termos dos artigos num botao
