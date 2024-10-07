@@ -1,9 +1,3 @@
-For a README for "websm," here's a suggestion that outlines the project's purpose, features, setup, and contribution guidelines. As for licensing, the Mozilla Public License (MPL) is a good choice since it's less restrictive than GPLv3, allowing more flexibility. If you're comfortable with that, you can proceed with MPL. Otherwise, GPLv3 would be a suitable alternative if you want to ensure derivative works also use an open license.
-
-### Suggested README for "websm"
-
----
-
 # websm: Web Systematic Review Tool
 
 websm (Web Systematic Review) is an open-source tool designed to aid researchers in conducting systematic reviews using BERT-based zero-shot classification directly on the client side. This project aims to streamline the process of categorizing academic articles or other research documents, improving efficiency and user experience.
