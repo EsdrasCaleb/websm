@@ -8,7 +8,7 @@ const UploadCsv = ({setData,data}) => {
     const [loading, setLoading] = useState(false);
     const handleCSVUpload = (file) => {
         const reader = new FileReader();
-
+        setLoading(true)
         reader.onload = (e) => {
             const csvContent = e.target.result;
 
@@ -25,6 +25,7 @@ const UploadCsv = ({setData,data}) => {
 
                     setData(data.concat(formattedData)); // Populate the data into the table
                     message.success("CSV file uploaded successfully!");
+                    setLoading(false)
                 },
                 error: () => {
                     message.error("There was an error processing the CSV file.");
