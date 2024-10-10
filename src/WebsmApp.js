@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Checkbox, Layout, Space, Typography,message } from 'antd';
+import { Table, Button, Input, /*Checkbox,*/ Layout, Space, Typography,message } from 'antd';
 import 'antd/dist/reset.css';
 import './App.css';
 import UploadBibtex from "./components/uploadBibtex";
@@ -11,7 +11,7 @@ const { Search } = Input;
 
 const WebsmApp = () => {
     const [dataSource, setDataSource] = useState([]);
-    const [selected, setSelected] = useState([]);
+    //const [selected, setSelected] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(false);
 
