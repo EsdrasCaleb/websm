@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Input, Checkbox, Layout, Space, Typography } from 'antd';
+import { Table, Button, Input, Checkbox, Layout, Space, Typography,message } from 'antd';
 import 'antd/dist/reset.css';
 import './App.css';
 import UploadBibtex from "./components/uploadBibtex";
 import UploadCsv from "./components/uploadCsv";
-//import {zeroShotClassification, extractKeywords} from "./lib/functions";
+import {zeroShotClassification, extractKeywords, downloadCSV} from "./lib/functions";
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -19,9 +19,54 @@ const WebsmApp = () => {
         setFilteredData(dataSource);
     }, [dataSource]);
 
-    console.log(dataSource)
+
+    const createKeywords = () =>{
+        setDataSource(dataSource.map((item)=>({
+            ...item, // Spread the existing item properties
+            abstract_keywords: extractKeywords(item.abstract)
+        })));
+    }
+
+    const downloadAction = ()=>{
+        if(dataSource.length > 0){
+            downloadCSV(dataSource,["name","abstract","abstract_score","title_score","abstract_keywords"])
+        }
+        else{
+            message.error("No data to download");
+        }
+    }
 
 
+    const classifyDataSource = async (dataSource,label) => {
+        const results = await Promise.all(dataSource.map(async (item) => {
+            const abstract_score = await zeroShotClassification(item.abstract, label);
+            const title_score = await zeroShotClassification(item.title, label);
+
+            // Returning the original item along with the scores
+            return {
+                ...item,
+                abstract_score,
+                title_score
+            };
+        }));
+        console.log(results)
+        return results;
+    };
+    const classifyArticles = (value) => {
+        if(dataSource.length > 0) {
+            console.log(value)
+            classifyDataSource(dataSource,value)
+                .then((classifiedData) => {
+                    setDataSource(classifiedData);
+                })
+                .catch((error) => {
+                    message.error("Error classifying data:", error);
+                });
+        }
+        else{
+            message.error("Write a term");
+        }
+    }
     const handleSearch = (value) => {
         setLoading(true);
         const filtered = dataSource.filter((item) =>
@@ -41,13 +86,26 @@ const WebsmApp = () => {
             title: 'Abstract',
             dataIndex: 'abstract',
             key: 'abstract',
-            render: (text) => <span title={text}>{text.slice(0, 100)}...</span>, // Shorten abstract with tooltip
+            render: (text) => <span title={text}>{text?.slice(0, 100)}...</span>, // Shorten abstract with tooltip
         },
         {
-            title: 'Citations',
-            dataIndex: 'citations',
-            key: 'citations',
+            title: 'Abstract Keywords',
+            dataIndex: 'abstract_keywords',
+            key: 'abstract_keywords',
+            render: (_, record) => record?.abstract_keywords ?? 'not calculated',
         },
+        {
+            title: 'Title Score',
+            dataIndex: 'title_score',
+            key: 'title_score',
+            render: (_, record) => record?.title_score ?? 'not calculated',
+        },
+        {
+            title: 'Abstract Score',
+            dataIndex: 'abstract_score',
+            key: 'abstract_score',
+            render: (_, record) => record?.abstract_score ?? 'not calculated',
+        }/*,
         {
             title: 'Select',
             render: (_, record) => (
@@ -59,7 +117,7 @@ const WebsmApp = () => {
                             }
                 />
             ),
-        },
+        },*/
     ];
 
     return (
@@ -69,8 +127,16 @@ const WebsmApp = () => {
                     <Space align="center">
                         <UploadBibtex setData={setDataSource} />
                         <UploadCsv setData={setDataSource}  />
+                        <Button onClick={createKeywords} type="default" >Predict Abstract Keywords</Button>
                     </Space>
-                    <Button type="default" style={{marginLeft: 'auto'}}>Export as CSV</Button>
+                    <Search
+                        placeholder="input classigy text"
+                        allowClear
+                        enterButton="Classify"
+                        style={{width: '30%',paddingLeft:'2em'}}
+                        onSearch={classifyArticles}
+                    />
+                    <Button type="default" onClick={downloadAction} style={{marginLeft: 'auto'}}>Export as CSV</Button>
                 </div>
             </Header>
             <Content style={{padding: '50px', textAlign: 'center'}}>
