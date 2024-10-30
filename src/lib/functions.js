@@ -7,7 +7,7 @@ import nlp from 'compromise';
 let model;
 let instance;
 
-const loadInstance = async () => {
+const loadInstanceNew = async () => {
     if(!instance){
         instance = await pipeline(
             "zero-shot-classification",
@@ -90,4 +90,3 @@ export const downloadCSV = (dataSource,collums) => {
 };
 
 loadModelOld();
-loadInstance();
