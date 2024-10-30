@@ -1,23 +1,39 @@
 import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
+import { pipeline } from '@huggingface/transformers';
 import nlp from 'compromise';
 
-let model;
 
+let model;
+let instance;
+
+const loadInstance = async () => {
+    if(!instance){
+        instance = await pipeline(
+            "zero-shot-classification",
+            "facebook/bart-large-mnli",
+            { device: "webgpu" },);
+    }
+}
 // Load the Universal Sentence Encoder model
-const loadModel = async () => {
+const loadModelOld = async () => {
     if (!model) {
         model = await use.load();
     }
     return model;
 };
 
-// Function for zero-shot classification
 export const zeroShotClassification = async (text, candidateLabel) => {
+    const score_label = await instance(text, [candidateLabel])
+    return score_label[0]
+}
+
+// Function for zero-shot classification
+export const zeroShotClassificationOld = async (text, candidateLabel) => {
     if(!text||!candidateLabel){
         return 0;
     }
-    await loadModel();
+    await loadModelOld();
     const embeddings = await model.embed([text, candidateLabel]);
 
     const textEmbedding = embeddings.arraySync()[0];  // Text embedding
@@ -73,4 +89,5 @@ export const downloadCSV = (dataSource,collums) => {
     URL.revokeObjectURL(url);
 };
 
-loadModel();
+loadModelOld();
+loadInstance();
