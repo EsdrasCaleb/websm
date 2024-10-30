@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
-import { pipeline } from '@huggingface/transformers';
+import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.1';
 import nlp from 'compromise';
 
 
@@ -11,7 +11,7 @@ const loadInstance = async () => {
     if(!instance){
         instance = await pipeline(
             "zero-shot-classification",
-            "facebook/bart-large-mnli",
+            "Xenova/bart-large-mnli",
             { device: "webgpu" },);
     }
 }
